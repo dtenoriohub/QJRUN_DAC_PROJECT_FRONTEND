@@ -1,8 +1,8 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import Login from "../pages/Login/Login";
-import Cadastro from "../pages/Cadastro/Cadastro";
-import Home from "../pages/Home";
+import Login from "../Pages/Login/Login";
+import Cadastro from "../Pages/Cadastro/Cadastro";
+import Home from "../Pages/Home/Home";
 
 export default function AppRoutes() {
   return (
