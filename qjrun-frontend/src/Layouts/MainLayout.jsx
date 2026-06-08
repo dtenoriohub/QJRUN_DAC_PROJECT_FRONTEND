@@ -1,8 +1,15 @@
+import Sidebar from "../Components/Sidebar";
+
 export default function MainLayout({ children }) {
   return (
-    <div>
-      <h1>MAIN LAYOUT FUNCIONANDO</h1>
-      {children}
+    <div className="flex min-h-screen">
+
+      <Sidebar />
+
+      <main className="flex-1 bg-gray-100 p-8">
+        {children}
+      </main>
+
     </div>
   );
 }

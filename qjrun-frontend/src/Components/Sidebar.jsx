@@ -33,17 +33,26 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="w-64 bg-slate-900 text-white h-screen">
+      <aside
+    className="
+      w-64
+      h-screen
+      text-white
+      bg-gradient-to-b
+      from-green-950
+      to-green-700
+    "
+  >
 
-      <div className="p-6">
+    <div className="p-6 border-b border-green-800">
 
-        <h1 className="text-2xl font-bold">
-          QJRun
-        </h1>
+      <h1 className="text-3xl font-extrabold">
+        <span className="text-lime-400">QJ</span>Run
+      </h1>
 
-      </div>
+    </div>
 
-      <nav className="px-4">
+    <nav className="px-4 mt-4">
 
         {menuItems.map(item => (
 
@@ -56,7 +65,7 @@ export default function Sidebar() {
               gap-3
               p-3
               rounded-lg
-              hover:bg-slate-800
+              hover:bg-green-700
               transition
               mb-2
             "
