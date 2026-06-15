@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import mainLayout from "../../Layouts/MainLayout";
 
 import Button from "../../Components/Button";
 import Input from "../../Components/Input";
@@ -18,7 +19,7 @@ export default function Login() {
     >
       <div
         className="
-          bg-white
+          bg-gray
           w-full
           max-w-md
           p-10
@@ -38,7 +39,7 @@ export default function Login() {
             <span className="text-lime-500">QJ</span>Run
           </h1>
 
-          <p className="text-gray-500 mt-2">
+          <p className="text-black-500 mt-2">
             Sistema para gerenciamento de corridas e eventos esportivos.
           </p>
 
