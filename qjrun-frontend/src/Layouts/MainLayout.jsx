@@ -6,7 +6,7 @@ export default function MainLayout({ children }) {
 
       <Sidebar />
 
-      <main className="flex-1 bg-gray-100 p-8">
+      <main className="flex-1 bg-gray-300 p-8">
         {children}
       </main>
 
