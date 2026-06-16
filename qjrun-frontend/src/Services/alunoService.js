@@ -7,11 +7,6 @@ export const alunoService = {
     return response.data;
   },
 
-  async getById(id) {
-    const response = await api.get(`/alunos/${id}`);
-    return response.data;
-  },
-
   async create(aluno) {
     const response = await api.post("/alunos", aluno);
     return response.data;
