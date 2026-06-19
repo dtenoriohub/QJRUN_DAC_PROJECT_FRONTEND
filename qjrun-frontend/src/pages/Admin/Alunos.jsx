@@ -1,143 +1,111 @@
-import MainLayout from "../../Layouts/MainLayout";
+import { useEffect, useState } from "react";
+
+import CrudPage from "../../Components/CrudPage";
+
+import {
+  listarAlunos
+} from "../../Services/alunoService";
 
 export default function Alunos() {
 
-  const alunos = [
-    {
-      id: 1,
-      nome: "João Silva",
-      matricula: "2025001",
-      plano: "Plano Pendente",
-      turma: "Sem Turma"
-    },
-    {
-      id: 2,
-      nome: "Maria Oliveira",
-      matricula: "2025002",
-      plano: "Mensal",
-      turma: "Iniciante"
+  const [alunos, setAlunos] = useState([]);
+
+  useEffect(() => {
+    carregarAlunos();
+  }, []);
+
+  async function carregarAlunos() {
+
+    try {
+
+      const dados = await listarAlunos();
+
+      setAlunos(dados);
+
+    } catch (error) {
+
+      console.error(
+        "Erro ao carregar alunos:",
+        error
+      );
+
     }
-  ];
+
+  }
 
   return (
-    <MainLayout>
 
-      <div className="flex justify-between items-center mb-6">
+    <CrudPage
+      title="Alunos"
+      buttonText="Novo Aluno"
+      columns={[
+        "Nome",
+        "Matrícula",
+        "Plano",
+        "Turma",
+        "Ações"
+      ]}
+      data={alunos}
+      renderRow={(aluno) => (
 
-        <h1 className="text-3xl font-bold">
-          Alunos
-        </h1>
-
-        <button
-          className="
-            bg-green-700
-            hover:bg-green-800
-            text-white
-            px-4
-            py-2
-            rounded-lg
-          "
+        <tr
+          key={aluno.id}
+          className="border-t"
         >
-          Novo Aluno
-        </button>
 
-      </div>
+          <td className="p-4">
+            {aluno.nome}
+          </td>
 
-      <div className="bg-white rounded-xl shadow overflow-hidden">
+          <td className="p-4">
+            {aluno.matricula}
+          </td>
 
-        <table className="w-full">
+          <td className="p-4">
+            {aluno.plano?.tipo || "-"}
+          </td>
 
-          <thead>
+          <td className="p-4">
+            {aluno.turma?.nome || "-"}
+          </td>
 
-            <tr className="bg-gray-100">
+          <td className="p-4">
 
-              <th className="text-left p-4">
-                Nome
-              </th>
+            <div className="flex gap-2">
 
-              <th className="text-left p-4">
-                Matrícula
-              </th>
-
-              <th className="text-left p-4">
-                Plano
-              </th>
-
-              <th className="text-left p-4">
-                Turma
-              </th>
-
-              <th className="text-left p-4">
-                Ações
-              </th>
-
-            </tr>
-
-          </thead>
-
-          <tbody>
-
-            {alunos.map(aluno => (
-
-              <tr
-                key={aluno.id}
-                className="border-t"
+              <button
+                className="
+                  bg-blue-600
+                  text-white
+                  px-3
+                  py-1
+                  rounded
+                "
               >
+                Editar
+              </button>
 
-                <td className="p-4">
-                  {aluno.nome}
-                </td>
+              <button
+                className="
+                  bg-red-600
+                  text-white
+                  px-3
+                  py-1
+                  rounded
+                "
+              >
+                Desativar
+              </button>
 
-                <td className="p-4">
-                  {aluno.matricula}
-                </td>
+            </div>
 
-                <td className="p-4">
-                  {aluno.plano}
-                </td>
+          </td>
 
-                <td className="p-4">
-                  {aluno.turma}
-                </td>
+        </tr>
 
-                <td className="p-4 flex gap-2">
+      )}
+    />
 
-                  <button
-                    className="
-                      bg-blue-600
-                      text-white
-                      px-3
-                      py-1
-                      rounded
-                    "
-                  >
-                    Editar
-                  </button>
-
-                  <button
-                    className="
-                      bg-red-600
-                      text-white
-                      px-3
-                      py-1
-                      rounded
-                    "
-                  >
-                    Desativar
-                  </button>
-
-                </td>
-
-              </tr>
-
-            ))}
-
-          </tbody>
-
-        </table>
-
-      </div>
-
-    </MainLayout>
   );
+
 }

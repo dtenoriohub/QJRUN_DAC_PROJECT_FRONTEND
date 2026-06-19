@@ -88,7 +88,7 @@ export default function AppRoutes() {
 
         {/* PROFESSOR */}
         <Route
-          path="/professor/dashboard"
+          path="/professor/Dashboard"
           element={<ProfessorDashboard />}
         />
 
