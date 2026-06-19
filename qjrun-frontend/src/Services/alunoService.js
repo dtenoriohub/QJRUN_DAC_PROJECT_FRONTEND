@@ -1,24 +1,53 @@
 import api from "../Api/axiosConfig";
 
-export const alunoService = {
+export async function listarAlunos() {
 
-  async getAll() {
-    const response = await api.get("/alunos");
-    return response.data;
-  },
+  const response = await api.get(
+    "/alunos",
+    {
+      headers: {
+        "Perfil-Usuario": "ROLE_ADMIN"
+      }
+    }
+  );
 
-  async create(aluno) {
-    const response = await api.post("/alunos", aluno);
-    return response.data;
-  },
+  return response.data;
+}
 
-  async update(id, aluno) {
-    const response = await api.put(`/alunos/${id}`, aluno);
-    return response.data;
-  },
+export async function criarAluno(aluno) {
 
-  async delete(id) {
-    await api.delete(`/alunos/${id}`);
-  }
+  const response = await api.post(
+    "/alunos",
+    aluno,
+    {
+      headers: {
+        "Perfil-Usuario": "ROLE_ADMIN"
+      }
+    }
+  );
 
-};
+  return response.data;
+}
+
+export async function atualizarAluno(id, aluno) {
+
+  const response = await api.put(
+    `/alunos/${id}`,
+    aluno
+  );
+
+  return response.data;
+}
+
+export async function excluirAluno(id) {
+
+  await api.delete(
+    `/alunos/${id}`,
+    {
+      headers: {
+        "Perfil-Usuario": "ROLE_ADMIN"
+      }
+    }
+  );
+
+}

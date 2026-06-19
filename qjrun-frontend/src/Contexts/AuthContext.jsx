@@ -4,11 +4,11 @@ const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
 
-  const [user, setUser] = useState({
-    id: 1,
-    nome: "Administrador",
-    perfil: "ROLE_ADMIN"
-  });
+const [user, setUser] = useState({
+  id: 1,
+  nome: "danilo",
+  perfil: "ROLE_\ADMIN"
+});
 
   return (
     <AuthContext.Provider
