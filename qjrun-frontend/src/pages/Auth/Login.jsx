@@ -77,6 +77,20 @@ export default function Login() {
           </Button>
           
           <button
+            type="button"
+            className="
+              w-full
+              text-green-800
+              hover:text-green-600
+              font-medium
+            "
+            onClick={() => navigate("/esqueci-senha")}
+          >
+            Esqueci minha senha
+          </button>
+
+          
+          <button
             className="
               w-full
               text-green-800
