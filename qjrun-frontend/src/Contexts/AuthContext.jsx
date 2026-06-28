@@ -7,7 +7,7 @@ export function AuthProvider({ children }) {
 const [user, setUser] = useState({
   id: 1,
   nome: "danilo",
-  perfil: "ROLE_\ADMIN"
+  perfil: "ROLE_ADMIN"
 });
 
   return (

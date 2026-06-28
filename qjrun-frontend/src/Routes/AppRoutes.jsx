@@ -1,5 +1,8 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+import EsqueciSenha from "../Pages/Auth/RedefinirSenha";
+
+
 import Cadastro from "../Pages/Cadastro/Cadastro";
 
 // AUTH
@@ -131,6 +134,11 @@ export default function AppRoutes() {
         <Route
           path="/aluno/eventos"
           element={<AlunoEventos />}
+        />
+
+        <Route
+            path="/esqueci-senha"
+            element={<EsqueciSenha />}
         />
 
       </Routes>
