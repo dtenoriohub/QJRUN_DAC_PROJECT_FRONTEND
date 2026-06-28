@@ -26,7 +26,7 @@ export default function Cadastro() {
       ...old,
       [name]: value
     }));
-
+   
   }
 
   async function handleSubmit(e) {
