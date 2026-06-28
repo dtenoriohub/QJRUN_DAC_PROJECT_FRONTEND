@@ -3,10 +3,11 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import EsqueciSenha from "../Pages/Auth/RedefinirSenha";
 
 
-import Cadastro from "../Pages/Cadastro/Cadastro";
+
 
 // AUTH
 import Login from "../Pages/Auth/Login";
+import Cadastro from "../Pages/Auth/Cadastro";
 
 // ADMIN
 import AdminDashboard from "../Pages/Admin/Dashboard";
@@ -44,8 +45,8 @@ export default function AppRoutes() {
 
         {/* CADASTRO */}
         <Route
-          path="/cadastro"
-          element={<Cadastro />}
+            path="/cadastro"
+            element={<Cadastro />}
         />
 
         {/* ADMIN */}

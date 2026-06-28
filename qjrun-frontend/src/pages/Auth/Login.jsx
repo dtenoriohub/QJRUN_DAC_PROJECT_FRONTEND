@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../Contexts/AuthContext";
-
+import Cadastro from "../Auth/Cadastro";
 import Button from "../../Components/Button";
 import Input from "../../Components/Input";
 
