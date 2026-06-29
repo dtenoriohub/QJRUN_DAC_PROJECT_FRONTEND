@@ -1,12 +1,14 @@
 export default function Button({
   children,
   onClick,
-  type = "button"
+  type = "submit", // 🔑 Mudamos o padrão para "submit" para disparar os formulários!
+  ...props         // 📦 Captura qualquer outra propriedade extra (como o disabled)
 }) {
   return (
     <button
       type={type}
       onClick={onClick}
+      {...props}   // 👈 Aplica o disabled e outras propriedades dinamicamente aqui
       className="
         w-full
         bg-lime-500
@@ -16,6 +18,8 @@ export default function Button({
         py-3
         rounded-xl
         transition
+        disabled:opacity-50
+        disabled:cursor-not-allowed
       "
     >
       {children}

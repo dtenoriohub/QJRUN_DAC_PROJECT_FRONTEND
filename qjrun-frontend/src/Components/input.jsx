@@ -1,11 +1,13 @@
 export default function Input({
   type = "text",
-  placeholder
+  placeholder,
+  ...props // 🔑 O segredo está aqui! Captura todas as outras propriedades (name, value, onChange)
 }) {
   return (
     <input
       type={type}
       placeholder={placeholder}
+      {...props} // 🔑 Injeta as propriedades dinamicamente na tag nativa
       className="
         w-full
         border
