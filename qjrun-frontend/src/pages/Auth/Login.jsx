@@ -7,38 +7,47 @@ import Input from "../../Components/Input";
 
 export default function Login() {
   const navigate = useNavigate();
-  
-  // 🔑 1. Puxamos a função 'login' lá de dentro do seu Contexto de Autenticação
   const { login } = useAuth();
 
-  // 📝 2. Criamos os estados para capturar os textos digitados e possíveis erros
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [erro, setErro] = useState("");
   const [carregando, setCarregando] = useState(false);
 
-  // 🔄 3. Função de login integrada com o backend
   const handleLogin = async (e) => {
-    e.preventDefault(); // Evita que a página recarregue
+    e.preventDefault();
     setErro("");
     setCarregando(true);
 
     try {
-      // Chama a função do seu Contexto que dispara o Axios e salva o Token
       const usuarioLogado = await login(email, senha);
 
-      // 🔀 Com base no perfil do usuário retornado pelo AuthMapper, redireciona:
-      if (usuarioLogado.perfilAcesso === "ROLE_ADMIN") {
+      // 🔑 Mapeamento unificado das propriedades retornadas pelo seu AuthMapper do Spring
+      const role = usuarioLogado.perfilAcesso || usuarioLogado.perfil;
+      const idUsuario = usuarioLogado.id; // 📥 Captura o ID do usuário vindo da resposta do backend
+
+      // 🔄 Salva o objeto no localStorage incluindo o ID essencial para a FK dos Planos
+      const usuarioDados = {
+        id: idUsuario,
+        nome: usuarioLogado.nome, // Já deixa o nome disponível para exibir na Sidebar
+        email: email,
+        perfil: role 
+      };
+      localStorage.setItem("@qjrun:user", JSON.stringify(usuarioDados));
+
+      // 🔀 Redirecionamento baseado nas ROLES oficiais
+      if (role === "ROLE_ADMIN") {
         navigate("/admin/dashboard");
-      } else if (usuarioLogado.perfilAcesso === "ROLE_PROFESSOR") {
+      } else if (role === "ROLE_PROFESSOR") {
         navigate("/professor/dashboard");
-      } else if (usuarioLogado.perfilAcesso === "ROLE_ALUNO") {
+      } else if (role === "ROLE_ALUNO") {
         navigate("/aluno/dashboard");
+      } else {
+        setErro("Perfil de acesso não reconhecido.");
       }
 
     } catch (err) {
       console.error(err);
-      // Se o backend der erro (ex: senha errada ou usuário não existe)
       setErro("E-mail ou senha incorretos. Tente novamente.");
     } finally {
       setCarregando(false);
@@ -46,25 +55,8 @@ export default function Login() {
   };
 
   return (
-    <div
-      className="
-        min-h-screen
-        flex
-        items-center
-        justify-center
-        bg-gray-100
-      "
-    >
-      <div
-        className="
-          bg-white
-          w-full
-          max-w-md
-          p-10
-          rounded-3xl
-          shadow-xl
-        "
-      >
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white w-full max-w-md p-10 rounded-3xl shadow-xl">
         <div className="text-center mb-8">
           <h1 className="text-5xl font-extrabold text-black">
             <span className="text-lime-500">QJ</span>Run
@@ -74,20 +66,18 @@ export default function Login() {
           </p>
         </div>
 
-        {/* ⚠️ Alerta de erro visual elegante */}
         {erro && (
           <div className="mb-4 p-3 bg-red-50 text-red-600 border border-red-200 rounded-xl text-sm text-center font-medium">
             {erro}
           </div>
         )}
 
-        {/* Envolvemos o bloco em um <form> para aceitar o "Enter" do teclado */}
         <form onSubmit={handleLogin} className="space-y-4">
           <Input
             type="email"
             placeholder="Digite seu email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)} // 🔑 Captura o e-mail
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
 
@@ -95,7 +85,7 @@ export default function Login() {
             type="password"
             placeholder="Digite sua senha"
             value={senha}
-            onChange={(e) => setSenha(e.target.value)} // 🔑 Captura a senha
+            onChange={(e) => setSenha(e.target.value)}
             required
           />
 
@@ -105,13 +95,7 @@ export default function Login() {
           
           <button
             type="button"
-            className="
-              w-full
-              text-green-800
-              hover:text-green-600
-              font-medium
-              text-sm
-            "
+            className="w-full text-green-800 hover:text-green-600 font-medium text-sm"
             onClick={() => navigate("/esqueci-senha")}
           >
             Esqueci minha senha
@@ -119,13 +103,7 @@ export default function Login() {
 
           <button
             type="button"
-            className="
-              w-full
-              text-green-800
-              hover:text-green-600
-              font-medium
-              text-sm
-            "
+            className="w-full text-green-800 hover:text-green-600 font-medium text-sm"
             onClick={() => navigate("/cadastro")}
           >
             Criar Conta

@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom"; // Importado useNavigate para redirecionamento
-import { adminService } from "../../Services/adminService"; // Importação do serviço integrado
+import { Link, useNavigate } from "react-router-dom"; 
+import api from "../../Api/api"; // 🔑 Importa diretamente a API para usar a rota de cadastro geral
 
 import Button from "../../Components/Button";
 import Input from "../../Components/Input";
 
 export default function Cadastro() {
-  const navigate = useNavigate(); // Instanciando o hook de navegação
+  const navigate = useNavigate(); 
   
   const [form, setForm] = useState({
     nome: "",
@@ -18,7 +18,6 @@ export default function Cadastro() {
     confirmarSenha: ""
   });
 
-  // Estados de controle para a interface
   const [erro, setErro] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -32,9 +31,9 @@ export default function Cadastro() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    setErro(""); // Limpa erros antigos
+    setErro(""); 
 
-    // 1. Validação local de senha antes de enviar para a API
+    // 1. Validação local de senha
     if (form.senha !== form.confirmarSenha) {
       setErro("As senhas não coincidem.");
       return;
@@ -43,19 +42,21 @@ export default function Cadastro() {
     setLoading(true);
 
     try {
-      // 2. Destruímos o 'confirmarSenha' para enviar ao backend apenas o DTO limpo
+      // 2. Destruímos o 'confirmarSenha' para montar o DTO idêntico ao CadastroRequestDTO do Java
       const { confirmarSenha, ...dadosParaEnvio } = form;
 
-      // 3. Chamada da API via service
-      await adminService.cadastrar(dadosParaEnvio);
+      // 3. Chamada direta para o endpoint do AuthController público
+      const response = await api.post("/auth/register", dadosParaEnvio);
 
-      alert("Conta de Administrador criada com sucesso!");
+      // Exibe a mensagem dinâmica retornada pelo Spring Boot ("Primeiro usuário..." ou "Cadastrado como Aluno")
+      alert(response.data.message || "Conta criada com sucesso!");
       
-      // 4. Redireciona para a tela de login (mude a rota "/" se a sua for diferente)
+      // 4. Redireciona para a tela de login
       navigate("/");
-    } catch (mensagemDeErro) {
-      // Captura a mensagem de erro que vem direto do seu Spring Boot ("E-mail já cadastrado", etc.)
-      setErro(mensagemDeErro);
+    } catch (err) {
+      // 5. Trata o erro capturando a resposta real da exceção do Spring Boot
+      const mensagemDoBackend = err.response?.data?.message || "Erro ao realizar cadastro. Tente novamente.";
+      setErro(mensagemDoBackend);
     } finally {
       setLoading(false);
     }
@@ -70,7 +71,7 @@ export default function Cadastro() {
             <span className="text-lime-500">QJ</span>Run
           </h1>
           <p className="text-gray-500 mt-2">
-            Crie sua conta de Administrador
+            Crie sua conta no sistema
           </p>
         </div>
 
@@ -140,7 +141,6 @@ export default function Cadastro() {
             required
           />
 
-          {/* O botão fica desabilitado enquanto a requisição estiver processando */}
           <Button type="submit" disabled={loading}>
             {loading ? "Cadastrando..." : "Criar Conta"}
           </Button>

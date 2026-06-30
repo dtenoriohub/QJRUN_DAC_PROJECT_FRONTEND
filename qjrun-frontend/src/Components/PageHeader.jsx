@@ -4,17 +4,15 @@ export default function PageHeader({
   onButtonClick
 }) {
   return (
-
     <div className="flex justify-between items-center mb-6">
-
       <h1 className="text-3xl font-bold">
         {title}
       </h1>
 
       {buttonText && (
-
         <button
-          onClick={onButtonClick}
+          // 🔑 A interrogação (?.) garante que se "onButtonClick" não for enviado, o React não trava a tela
+          onClick={() => onButtonClick?.()}
           className="
             bg-green-700
             hover:bg-green-800
@@ -27,10 +25,7 @@ export default function PageHeader({
         >
           {buttonText}
         </button>
-
       )}
-
     </div>
-
   );
 }
