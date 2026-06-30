@@ -20,22 +20,13 @@ export default function Login() {
     setCarregando(true);
 
     try {
+      // 1. O AuthContext faz o login e já gerencia o salvamento seguro do ID no localStorage
       const usuarioLogado = await login(email, senha);
 
-      // 🔑 Mapeamento unificado das propriedades retornadas pelo seu AuthMapper do Spring
-      const role = usuarioLogado.perfilAcesso || usuarioLogado.perfil;
-      const idUsuario = usuarioLogado.id; // 📥 Captura o ID do usuário vindo da resposta do backend
+      // 2. Captura a role unificada retornada de forma estável pelo contexto
+      const role = usuarioLogado?.perfil;
 
-      // 🔄 Salva o objeto no localStorage incluindo o ID essencial para a FK dos Planos
-      const usuarioDados = {
-        id: idUsuario,
-        nome: usuarioLogado.nome, // Já deixa o nome disponível para exibir na Sidebar
-        email: email,
-        perfil: role 
-      };
-      localStorage.setItem("@qjrun:user", JSON.stringify(usuarioDados));
-
-      // 🔀 Redirecionamento baseado nas ROLES oficiais
+      // 3. 🔀 Redirecionamento baseado nas ROLES oficiais
       if (role === "ROLE_ADMIN") {
         navigate("/admin/dashboard");
       } else if (role === "ROLE_PROFESSOR") {
