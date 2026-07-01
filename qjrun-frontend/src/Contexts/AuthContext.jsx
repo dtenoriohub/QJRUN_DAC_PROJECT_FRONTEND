@@ -60,10 +60,10 @@ export function AuthProvider({ children }) {
    * 🚪 FUNÇÃO DE LOGOUT
    */
   const logout = () => {
-    localStorage.removeItem("@qjrun:token");
-    localStorage.removeItem("@qjrun:user");
-    setUser(null);
-  };
+    localStorage.removeItem("token"); // Remove o token
+    delete api.defaults.headers.common["Authorization"]; // Remove o header do Axios
+    setUser(null); // Reseta o estado do usuário para null
+};
 
   return (
     <AuthContext.Provider
