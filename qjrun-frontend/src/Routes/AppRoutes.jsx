@@ -9,18 +9,11 @@ import EsqueciSenha from "../Pages/Auth/RedefinirSenha";
 // ADMIN
 import AdminDashboard from "../Pages/Admin/Dashboard";
 import Alunos from "../Pages/Admin/Alunos";
-import Professores from "../Pages/Admin/Professores";
 import Turmas from "../Pages/Admin/Turmas";
 import Planos from "../Pages/Admin/Planos";
 import Pagamentos from "../Pages/Admin/Pagamentos";
 import Eventos from "../Pages/Admin/Eventos";
 import Inscricoes from "../Pages/Admin/Inscricoes";
-
-// PROFESSOR
-import ProfessorDashboard from "../Pages/Professor/Dashboard";
-import MinhasTurmas from "../Pages/Professor/MinhasTurmas";
-import MeusAlunos from "../Pages/Professor/MeusAlunos";
-import ProfessorEventos from "../Pages/Professor/Eventos";
 
 // ALUNO
 import AlunoDashboard from "../Pages/Aluno/Dashboard";
@@ -42,20 +35,11 @@ export default function AppRoutes() {
         <Route element={<ProtectedRoute allowedRoles={["ROLE_ADMIN"]} />}>
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/alunos" element={<Alunos />} />
-          <Route path="/admin/professores" element={<Professores />} />
           <Route path="/admin/turmas" element={<Turmas />} />
           <Route path="/admin/planos" element={<Planos />} />
           <Route path="/admin/pagamentos" element={<Pagamentos />} />
           <Route path="/admin/eventos" element={<Eventos />} />
           <Route path="/admin/inscricoes" element={<Inscricoes />} />
-        </Route>
-
-        {/* 🔐 BLOCO PROFESSOR (Apenas ROLE_PROFESSOR acessa) */}
-        <Route element={<ProtectedRoute allowedRoles={["ROLE_PROFESSOR"]} />}>
-          <Route path="/professor/dashboard" element={<ProfessorDashboard />} />
-          <Route path="/professor/turmas" element={<MinhasTurmas />} />
-          <Route path="/professor/alunos" element={<MeusAlunos />} />
-          <Route path="/professor/eventos" element={<ProfessorEventos />} />
         </Route>
 
         {/* 🔐 BLOCO ALUNO (Apenas ROLE_ALUNO acessa) */}

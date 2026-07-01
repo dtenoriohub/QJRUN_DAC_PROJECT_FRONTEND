@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import api from "../Api/api"; // 👈 Garanta que tem apenas dois pontos (..)
+import api from "../Api/api";
 
 const AuthContext = createContext();
 
@@ -28,24 +28,29 @@ export function AuthProvider({ children }) {
     // 1. Dispara a requisição para o seu AuthController do Spring Boot
     const response = await api.post("/auth/login", { email, senha });
     
-    // O seu AuthMapper retorna as propriedades: token, email, perfilAcesso (ou similar)
-    const { token, perfilAcesso } = response.data;
+    // 📦 Captura o token e todas as propriedades do usuário retornadas pelo backend
+    const { token, id, nome, perfilAcesso, perfil } = response.data;
 
     if (token) {
-      // 2. Salva o Token e os dados básicos no LocalStorage do navegador
+      // 2. Salva o Token no LocalStorage
       localStorage.setItem("@qjrun:token", token);
       
+      // 🚀 Monta o objeto unificado garantindo a captura do ID e do Nome para o Aluno
       const usuarioDados = {
-        email: response.data.email,
-        perfil: perfilAcesso // 🔑 Mapeia para a string "ROLE_ADMIN", "ROLE_ALUNO", etc.
+        id: id || response.data.usuario?.id, // Tenta pegar da raiz ou de um objeto interno caso mude no futuro
+        nome: nome || response.data.usuario?.nome || "Usuário",
+        email: response.data.email || email,
+        perfil: perfilAcesso || perfil // Aceita ambas as nomenclaturas de Role
       };
       
+      // 🔄 Persiste no LocalStorage de forma definitiva
       localStorage.setItem("@qjrun:user", JSON.stringify(usuarioDados));
       
       // 3. Atualiza o estado global do contexto com o usuário logado
       setUser(usuarioDados);
       
-      return response.data;
+      // Retorna o objeto completo para que o Login.jsx também possa ler as propriedades
+      return usuarioDados;
     }
     
     throw new Error("Falha na autenticação");
@@ -55,10 +60,10 @@ export function AuthProvider({ children }) {
    * 🚪 FUNÇÃO DE LOGOUT
    */
   const logout = () => {
-    localStorage.removeItem("@qjrun:token");
-    localStorage.removeItem("@qjrun:user");
-    setUser(null);
-  };
+    localStorage.removeItem("token"); // Remove o token
+    delete api.defaults.headers.common["Authorization"]; // Remove o header do Axios
+    setUser(null); // Reseta o estado do usuário para null
+};
 
   return (
     <AuthContext.Provider

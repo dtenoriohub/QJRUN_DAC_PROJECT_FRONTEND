@@ -1,111 +1,44 @@
 import { useEffect, useState } from "react";
-
-import CrudPage from "../../Components/CrudPage";
-
-import {
-  listarAlunos
-} from "../../Services/alunoService";
+import MainLayout from "../../Layouts/MainLayout";
+import Table from "../../Components/Table";
+import api from "../../Api/api";
 
 export default function Alunos() {
-
   const [alunos, setAlunos] = useState([]);
+
+  async function carregarAlunos() {
+    try {
+      const response = await api.get("/alunos");
+      setAlunos(response.data);
+    } catch (err) {
+      console.error("Erro ao buscar alunos:", err);
+    }
+  }
 
   useEffect(() => {
     carregarAlunos();
   }, []);
 
-  async function carregarAlunos() {
-
-    try {
-
-      const dados = await listarAlunos();
-
-      setAlunos(dados);
-
-    } catch (error) {
-
-      console.error(
-        "Erro ao carregar alunos:",
-        error
-      );
-
-    }
-
-  }
-
   return (
+    <MainLayout>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold">Gestão de Alunos</h1>
+      </div>
 
-    <CrudPage
-      title="Alunos"
-      buttonText="Novo Aluno"
-      columns={[
-        "Nome",
-        "Matrícula",
-        "Plano",
-        "Turma",
-        "Ações"
-      ]}
-      data={alunos}
-      renderRow={(aluno) => (
-
-        <tr
-          key={aluno.id}
-          className="border-t"
-        >
-
-          <td className="p-4">
-            {aluno.nome}
-          </td>
-
-          <td className="p-4">
-            {aluno.matricula}
-          </td>
-
-          <td className="p-4">
-            {aluno.plano?.tipo || "-"}
-          </td>
-
-          <td className="p-4">
-            {aluno.turma?.nome || "-"}
-          </td>
-
-          <td className="p-4">
-
-            <div className="flex gap-2">
-
-              <button
-                className="
-                  bg-blue-600
-                  text-white
-                  px-3
-                  py-1
-                  rounded
-                "
-              >
-                Editar
-              </button>
-
-              <button
-                className="
-                  bg-red-600
-                  text-white
-                  px-3
-                  py-1
-                  rounded
-                "
-              >
-                Desativar
-              </button>
-
-            </div>
-
-          </td>
-
-        </tr>
-
-      )}
-    />
-
+      <Table columns={["Nome", "Matrícula", "CPF", "Plano", "Turma", "Status"]}>
+        {alunos.map((aluno) => (
+          <tr key={aluno.id} className="border-t">
+            <td className="p-4">{aluno.nome}</td>
+            <td className="p-4">{aluno.matricula}</td>
+            <td className="p-4">{aluno.cpf}</td>
+            <td className="p-4">{aluno.plano}</td>
+            <td className="p-4">{aluno.turma}</td>
+            <td className="p-4">
+              {aluno.ativo ? "Ativo" : "Inativo"}
+            </td>
+          </tr>
+        ))}
+      </Table>
+    </MainLayout>
   );
-
 }

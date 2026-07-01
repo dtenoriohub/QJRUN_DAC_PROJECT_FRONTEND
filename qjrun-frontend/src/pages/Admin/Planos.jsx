@@ -143,7 +143,7 @@ export default function Planos() {
                   {/* 🔑 Botão Editar - Passa o objeto do plano atual */}
                   <button 
                     onClick={() => iniciarEdicao(plano)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm transition"
+                    className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition"
                   >
                     Editar
                   </button>
