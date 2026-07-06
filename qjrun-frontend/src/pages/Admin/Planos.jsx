@@ -3,7 +3,8 @@ import MainLayout from "../../Layouts/MainLayout";
 import PageHeader from "../../Components/PageHeader";
 import Table from "../../Components/Table";
 import Input from "../../Components/Input"; 
-import Button from "../../Components/Button"; 
+import Button from "../../Components/Button";
+import Modal from "../../Components/Modal";
 import api from "../../Api/api";
 
 export default function Planos() {
@@ -19,6 +20,11 @@ export default function Planos() {
   const [duracaoMeses, setDuracaoMeses] = useState("");
   const [descricao, setDescricao] = useState("");
   const [salvando, setSalvando] = useState(false);
+
+  // 👁️ Estados para Modal de Visualização de Alunos
+  const [isViewStudentsModalOpen, setIsViewStudentsModalOpen] = useState(false);
+  const [alunosDoPlano, setAlunosDoPlano] = useState([]);
+  const [planoSelecionado, setPlanoSelecionado] = useState(null);
 
   // 🔄 Função para buscar os planos do backend
   async function carregarPlanos() {
@@ -37,6 +43,18 @@ export default function Planos() {
   useEffect(() => {
     carregarPlanos();
   }, []);
+
+  // 👁️ Função para carregar alunos de um plano específico
+  async function handleViewStudents(plano) {
+    setPlanoSelecionado(plano);
+    try {
+      const response = await api.get(`/planos/${plano.id}/alunos`);
+      setAlunosDoPlano(response.data);
+      setIsViewStudentsModalOpen(true);
+    } catch (err) {
+      alert("Erro ao carregar alunos do plano.");
+    }
+  }
 
   // ✍️ Prepara o Modal com os dados do plano para Edição
   const iniciarEdicao = (plano) => {
@@ -127,7 +145,8 @@ export default function Planos() {
       {loading ? (
         <div className="p-6 text-gray-500 font-medium text-center">Carregando planos...</div>
       ) : (
-        <Table columns={["Plano", "Preço", "Duração", "Criado Por", "Ações"]}>
+        // 🛠️ Adicionado "Alunos" nas colunas da tabela
+        <Table columns={["Plano", "Preço", "Duração", "Criado Por", "Alunos", "Ações"]}>
           {planos.map((plano) => (
             <tr key={plano.id} className="border-t hover:bg-gray-50/50 transition">
               <td className="p-4 font-semibold text-gray-900">{plano.tipo || "Sem Tipo"}</td>
@@ -138,6 +157,17 @@ export default function Planos() {
                 {plano.duracaoMeses ? `${plano.duracaoMeses} meses` : "Não informada"}
               </td>
               <td className="p-4 text-gray-500 text-sm">{plano.administrador?.nome || "Sistema"}</td>
+
+              {/* 👥 Nova coluna de Alunos */}
+              <td className="p-4">
+                <button
+                  onClick={() => handleViewStudents(plano)}
+                  className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition"
+                >
+                  Visualizar alunos
+                </button>
+              </td>
+
               <td className="p-4">
                 <div className="flex gap-2">
                   {/* 🔑 Botão Editar - Passa o objeto do plano atual */}
@@ -237,6 +267,39 @@ export default function Planos() {
           </div>
         </div>
       )}
+
+      {/* 👁️ MODAL DE VISUALIZAÇÃO DE ALUNOS */}
+      <Modal
+        isOpen={isViewStudentsModalOpen}
+        onClose={() => setIsViewStudentsModalOpen(false)}
+        title={`Alunos do Plano: ${planoSelecionado?.tipo || ""}`}
+      >
+        <div className="max-h-80 overflow-y-auto">
+          {alunosDoPlano.length > 0 ? (
+            <ul className="divide-y">
+              {alunosDoPlano.map((aluno) => (
+                <li key={aluno.id} className="py-2 flex justify-between items-center-2">
+                  <div>
+                    <span className="font-medium">{aluno.nome}</span>
+                    <span className="text-gray-500 text-sm block">({aluno.email})</span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-gray-500 text-center py-4">Nenhum aluno associado a este plano.</p>
+          )}
+        </div>
+        <div className="flex justify-end mt-4">
+          <button
+            onClick={() => setIsViewStudentsModalOpen(false)}
+            className="px-4 py-2 bg-gray-100 rounded"
+          >
+            Fechar
+          </button>
+        </div>
+      </Modal>
+      
     </MainLayout>
   );
 }
