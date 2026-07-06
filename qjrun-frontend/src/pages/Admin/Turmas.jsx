@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import MainLayout from "../../Layouts/MainLayout";
+import PageHeader from "../../Components/PageHeader";
 import Table from "../../Components/Table";
 import Modal from "../../Components/Modal";
 import api from "../../Api/api";
@@ -136,18 +137,12 @@ export default function Turmas() {
 
   return (
     <MainLayout>
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-2xl font-bold">Gestão de Turmas</h1>
-          <p className="text-gray-500">Lista de todas as turmas ativas.</p>
-        </div>
-        <button
-          onClick={handleOpenCreate}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition"
-        >
-          + Nova Turma
-        </button>
-      </div>
+      {/* Cabeçalho atualizado para usar o componente PageHeader */}
+      <PageHeader
+        title="Gestão de Turmas"
+        buttonText="Nova Turma"
+        onButtonClick={handleOpenCreate}
+      />
 
       <Table columns={["Nome", "Nível", "Horário", "Alunos", "Ações"]}>
         {turmas.map((turma) => (
