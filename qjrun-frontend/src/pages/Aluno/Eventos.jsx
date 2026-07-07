@@ -67,6 +67,26 @@ export default function Eventos() {
     }
   }
 
+  async function handleCancelar(eventoId) {
+    // Pede uma confirmação para o aluno não cancelar sem querer
+    const confirmar = window.confirm("Tem certeza que deseja cancelar sua inscrição neste evento?");
+    if (!confirmar) return;
+
+    try {
+      // Chama a rota de DELETE do backend
+      await api.delete(`/inscricoes/aluno/${user.id}/evento/${eventoId}`);
+
+      alert("Inscrição cancelada com sucesso!");
+      
+      // Recarrega a tela para o botão voltar a ser "Inscrever-se"
+      carregarDados();
+      
+    } catch (error) {
+      console.error("Erro ao cancelar:", error);
+      alert("Não foi possível cancelar a inscrição no momento.");
+    }
+  }
+
   return (
     <MainLayout>
       <h1 className="text-3xl font-bold mb-6">Eventos</h1>
@@ -111,19 +131,28 @@ export default function Eventos() {
                   </p>
                 </div>
 
-                {/* Renderização Condicional do Botão */}
+                {/* Renderização Condicional dos Botões */}
                 {estaInscrito ? (
-                  <button disabled className="w-full bg-gray-200 text-gray-600 py-2 rounded-lg font-semibold cursor-not-allowed">
-                    Inscrição Solicitada
-                  </button>
+                  <div className="flex flex-col gap-2 mt-auto">
+                    <button disabled className="w-full bg-gray-100 text-gray-600 py-2 rounded-lg font-semibold cursor-not-allowed">
+                      {evento.minhaInscricao.status === 'APROVADA' ? 'Inscrição Aprovada' : 'Inscrição Solicitada'}
+                    </button>
+                    
+                    <button 
+                      onClick={() => handleCancelar(evento.id)}
+                      className="w-full text-red-600 border border-red-600 py-1.5 rounded-lg hover:bg-red-50 transition font-semibold text-sm"
+                    >
+                      Cancelar Inscrição
+                    </button>
+                  </div>
                 ) : esgotado ? (
-                  <button disabled className="w-full bg-red-100 text-red-600 py-2 rounded-lg font-semibold cursor-not-allowed">
+                  <button disabled className="w-full bg-red-100 text-red-600 py-2 rounded-lg font-semibold cursor-not-allowed mt-auto">
                     Sem Vagas
                   </button>
                 ) : (
                   <button 
                     onClick={() => handleInscrever(evento.id)}
-                    className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition font-semibold shadow-sm"
+                    className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition font-semibold shadow-sm mt-auto"
                   >
                     Inscrever-se
                   </button>
