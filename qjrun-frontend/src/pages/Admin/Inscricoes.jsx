@@ -17,11 +17,8 @@ export default function Inscricoes() {
   async function carregarInscricoes() {
     setLoading(true);
     try {
-      const response = await api.get("/inscricoes/pendentes", {
-        headers: {
-          "Perfil-Usuario": user.perfil,
-        },
-      });
+      // 🧹 Requisição limpa
+      const response = await api.get("/inscricoes/pendentes");
       setInscricoes(response.data);
     } catch (error) {
       console.error("Erro ao carregar:", error);
@@ -32,15 +29,15 @@ export default function Inscricoes() {
   }
 
   async function handleAprovar(id) {
+    // Pede confirmação antes de aprovar (boa prática de UX)
+    const confirmar = window.confirm("Deseja realmente aprovar e consumir uma vaga deste evento?");
+    if (!confirmar) return;
+
     try {
-      // Importante: Passar o header também na aprovação
-      await api.patch(`/inscricoes/${id}/aprovar`, {}, {
-        headers: {
-          "Perfil-Usuario": user.perfil,
-        },
-      });
+      // 🧹 Requisição limpa
+      await api.patch(`/inscricoes/${id}/aprovar`);
       alert("Inscrição aprovada com sucesso!");
-      carregarInscricoes(); // Atualiza a lista
+      carregarInscricoes(); // Atualiza a lista automaticamente
     } catch (error) {
       alert("Erro ao aprovar: " + (error.response?.data?.message || "Tente novamente"));
     }
@@ -53,7 +50,7 @@ export default function Inscricoes() {
       </div>
 
       <div className="bg-white rounded-xl shadow overflow-hidden">
-        <table className="w-full">
+        <table className="w-full text-sm sm:text-base">
           <thead>
             <tr className="bg-gray-100 border-b">
               <th className="p-4 text-left">Aluno</th>
@@ -65,40 +62,29 @@ export default function Inscricoes() {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan="4" className="p-4 text-center">Carregando...</td>
+                <td colSpan="4" className="p-8 text-center text-gray-500 font-medium">Buscando solicitações...</td>
               </tr>
             ) : inscricoes.length === 0 ? (
               <tr>
-                <td colSpan="4" className="p-4 text-center text-gray-500">Nenhuma inscrição pendente encontrada.</td>
+                <td colSpan="4" className="p-8 text-center text-gray-500 font-medium">Nenhuma inscrição pendente encontrada.</td>
               </tr>
             ) : (
               inscricoes.map((inscricao) => (
-                <tr key={inscricao.id} className="border-b hover:bg-gray-50">
-                  {/* Verifique se o backend retorna exatamente 'alunoNome' e 'eventoNome' */}
-                  <td className="p-4">{inscricao.aluno?.nome || "N/A"}</td>
-                  <td className="p-4">{inscricao.evento?.nome || "N/A"}</td>
+                <tr key={inscricao.id} className="border-b hover:bg-gray-50 transition">
+                  <td className="p-4 font-medium text-gray-800">{inscricao.aluno?.nome || "N/A"}</td>
+                  <td className="p-4 text-gray-600">{inscricao.evento?.nome || "N/A"}</td>
                   <td className="p-4">
-                    <span
-                      className={`px-2 py-1 rounded text-xs font-bold ${
-                        inscricao.status === "APROVADA"
-                          ? "bg-green-100 text-green-800"
-                          : inscricao.status === "PENDENTE"
-                          ? "bg-yellow-100 text-yellow-800"
-                          : "bg-red-100 text-red-800"
-                      }`}
-                    >
+                    <span className="px-3 py-1 rounded-full text-xs font-bold uppercase bg-yellow-100 text-yellow-800">
                       {inscricao.status}
                     </span>
                   </td>
                   <td className="p-4 flex gap-2">
-                    {inscricao.status === "PENDENTE" && (
-                      <button
-                        onClick={() => handleAprovar(inscricao.id)}
-                        className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 transition"
-                      >
-                        Aprovar
-                      </button>
-                    )}
+                    <button
+                      onClick={() => handleAprovar(inscricao.id)}
+                      className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition font-semibold shadow-sm"
+                    >
+                      Aprovar Vaga
+                    </button>
                   </td>
                 </tr>
               ))

@@ -18,6 +18,7 @@ api.interceptors.request.use(
     if (userJson) {
       const user = JSON.parse(userJson);
       config.headers['Perfil-Usuario'] = user.perfil;
+      config.headers['Usuario-Id'] = user.id; // <-- NOVA LINHA ADICIONADA AQUI!
     }
 
     return config;
