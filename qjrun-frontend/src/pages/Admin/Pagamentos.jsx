@@ -1,25 +1,32 @@
 import { useState, useEffect } from "react";
 import MainLayout from "../../Layouts/MainLayout";
 import api from "../../Api/api";
-import { toast } from "react-toastify"; // Importação do Toast
+import { toast } from "react-toastify";
 
 export default function Pagamentos() {
   const [pagamentos, setPagamentos] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    carregarPagamentos();
-  }, []);
+  // Estados da Paginação
+  const [paginaAtual, setPaginaAtual] = useState(0);
+  const [totalPaginas, setTotalPaginas] = useState(0);
 
-  async function carregarPagamentos() {
+  // O useEffect "ouve" a página atual. Se mudar, busca os dados novamente
+  useEffect(() => {
+    carregarPagamentos(paginaAtual);
+  }, [paginaAtual]);
+
+  async function carregarPagamentos(page = 0) {
     try {
       setLoading(true);
-      // Busca os pagamentos reais do banco de dados
-      const response = await api.get("/pagamentos");
-      setPagamentos(response.data);
+      // Busca paginada: envia a página e o tamanho para o Spring Boot
+      const response = await api.get(`/pagamentos?page=${page}&size=7`);
+      
+      // O Spring Boot devolve os dados dentro de "content"
+      setPagamentos(response.data.content || []);
+      setTotalPaginas(response.data.totalPages || 0);
     } catch (error) {
       console.error("Erro ao carregar pagamentos:", error);
-      // Substituído por toast.error
       toast.error("Não foi possível carregar a lista de pagamentos.");
     } finally {
       setLoading(false);
@@ -31,17 +38,13 @@ export default function Pagamentos() {
     if (!confirmar) return;
 
     try {
-      // Chama a rota que faz a mágica da automação!
       await api.put(`/pagamentos/${id}/confirmar`);
-      
-      // Substituído por toast.success
       toast.success("Pagamento confirmado com sucesso!");
       
-      // Recarrega a tabela para atualizar o status e remover o botão
-      carregarPagamentos();
+      // Recarrega a página ATUAL para atualizar o status na tabela sem perder a navegação
+      carregarPagamentos(paginaAtual);
     } catch (error) {
       console.error("Erro ao confirmar:", error);
-      // Substituído por toast.error
       toast.error("Erro ao confirmar pagamento: " + (error.response?.data?.message || "Tente novamente"));
     }
   }
@@ -67,13 +70,22 @@ export default function Pagamentos() {
     return { descricao: "Cobrança Avulsa", valor: pagamento.valor || 0 };
   };
 
+  // Funções de navegação da paginação
+  function irParaPaginaAnterior() {
+    if (paginaAtual > 0) setPaginaAtual(paginaAtual - 1);
+  }
+
+  function irParaProximaPagina() {
+    if (paginaAtual < totalPaginas - 1) setPaginaAtual(paginaAtual + 1);
+  }
+
   return (
     <MainLayout>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-900">Gestão de Pagamentos</h1>
       </div>
 
-      <div className="bg-white rounded-xl shadow overflow-hidden">
+      <div className="bg-white rounded-xl shadow overflow-hidden flex flex-col">
         <table className="w-full text-sm sm:text-base">
           <thead>
             <tr className="bg-gray-100 border-b">
@@ -134,6 +146,41 @@ export default function Pagamentos() {
             )}
           </tbody>
         </table>
+
+        {/* Controles de Paginação no rodapé da tabela */}
+        {totalPaginas > 1 && (
+          <div className="p-4 bg-gray-50 border-t flex items-center justify-between mt-auto">
+            <span className="text-sm text-gray-600">
+              Página <span className="font-bold">{paginaAtual + 1}</span> de <span className="font-bold">{totalPaginas}</span>
+            </span>
+            
+            <div className="flex gap-2">
+              <button
+                onClick={irParaPaginaAnterior}
+                disabled={paginaAtual === 0}
+                className={`px-4 py-2 text-sm font-semibold rounded-lg border transition ${
+                  paginaAtual === 0 
+                    ? "bg-gray-100 text-gray-400 cursor-not-allowed border-transparent" 
+                    : "bg-white text-gray-700 hover:bg-gray-50 border-gray-300 shadow-sm"
+                }`}
+              >
+                Anterior
+              </button>
+              
+              <button
+                onClick={irParaProximaPagina}
+                disabled={paginaAtual >= totalPaginas - 1}
+                className={`px-4 py-2 text-sm font-semibold rounded-lg border transition ${
+                  paginaAtual >= totalPaginas - 1 
+                    ? "bg-gray-100 text-gray-400 cursor-not-allowed border-transparent" 
+                    : "bg-white text-gray-700 hover:bg-gray-50 border-gray-300 shadow-sm"
+                }`}
+              >
+                Próxima
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </MainLayout>
   );
