@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import MainLayout from "../../Layouts/MainLayout";
 import api from "../../Api/api";
+import { toast } from "react-toastify"; // Importação do Toast
 
 export default function Pagamentos() {
   const [pagamentos, setPagamentos] = useState([]);
@@ -18,7 +19,8 @@ export default function Pagamentos() {
       setPagamentos(response.data);
     } catch (error) {
       console.error("Erro ao carregar pagamentos:", error);
-      alert("Não foi possível carregar a lista de pagamentos.");
+      // Substituído por toast.error
+      toast.error("Não foi possível carregar a lista de pagamentos.");
     } finally {
       setLoading(false);
     }
@@ -29,15 +31,18 @@ export default function Pagamentos() {
     if (!confirmar) return;
 
     try {
-      // 🚀 Chama a nossa rota que faz a mágica da automação!
+      // Chama a rota que faz a mágica da automação!
       await api.put(`/pagamentos/${id}/confirmar`);
-      alert("Pagamento confirmado com sucesso!");
+      
+      // Substituído por toast.success
+      toast.success("Pagamento confirmado com sucesso!");
       
       // Recarrega a tabela para atualizar o status e remover o botão
       carregarPagamentos();
     } catch (error) {
       console.error("Erro ao confirmar:", error);
-      alert("Erro ao confirmar pagamento: " + (error.response?.data?.message || "Tente novamente"));
+      // Substituído por toast.error
+      toast.error("Erro ao confirmar pagamento: " + (error.response?.data?.message || "Tente novamente"));
     }
   }
 
