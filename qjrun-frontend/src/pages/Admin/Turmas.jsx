@@ -4,6 +4,7 @@ import PageHeader from "../../Components/PageHeader";
 import Table from "../../Components/Table";
 import Modal from "../../Components/Modal";
 import api from "../../Api/api";
+import { toast } from "react-toastify"; // Importação do Toast
 
 export default function Turmas() {
   const [turmas, setTurmas] = useState([]);
@@ -36,6 +37,7 @@ export default function Turmas() {
       setTurmas(response.data);
     } catch (err) {
       console.error("Erro ao buscar turmas:", err);
+      toast.error("Não foi possível carregar a lista de turmas.");
     }
   }
 
@@ -47,7 +49,7 @@ export default function Turmas() {
       setAlunosDaTurma(response.data);
       setIsViewStudentsModalOpen(true);
     } catch (err) {
-      alert("Erro ao carregar alunos da turma.");
+      toast.error("Erro ao carregar alunos da turma."); // Substituído por toast
     }
   }
 
@@ -57,13 +59,15 @@ export default function Turmas() {
     try {
       if (editingTurma) {
         await api.put(`/turmas/${editingTurma.id}`, formData);
+        toast.success("Turma atualizada com sucesso!"); // Adicionado sucesso
       } else {
         await api.post("/turmas", formData);
+        toast.success("Turma cadastrada com sucesso!"); // Adicionado sucesso
       }
       setIsModalOpen(false);
       carregarTurmas();
     } catch (err) {
-      alert("Erro ao salvar: " + err.message);
+      toast.error("Erro ao salvar: " + (err.response?.data?.message || err.message)); // Substituído por toast
     }
   }
 
@@ -89,6 +93,7 @@ export default function Turmas() {
       setAlunosDisponiveis(response.data);
     } catch (err) {
       console.error("Erro ao carregar alunos:", err);
+      toast.error("Erro ao carregar lista de alunos.");
     }
   }
 
@@ -99,11 +104,11 @@ export default function Turmas() {
           api.post(`/turmas/${turmaSelecionada.id}/alunos/${alunoId}`)
         )
       );
-      alert("Alunos vinculados com sucesso!");
+      toast.success("Alunos vinculados com sucesso!"); // Substituído por toast
       setIsVinculoModalOpen(false);
       carregarTurmas();
     } catch (err) {
-      alert("Erro ao vincular alunos: " + err.message);
+      toast.error("Erro ao vincular alunos: " + (err.response?.data?.message || err.message)); // Substituído por toast
     }
   }
 
@@ -112,9 +117,10 @@ export default function Turmas() {
     if (window.confirm("Tem certeza que deseja remover esta turma?")) {
       try {
         await api.delete(`/turmas/${id}`);
+        toast.success("Turma excluída com sucesso!"); // Adicionado sucesso
         carregarTurmas();
       } catch (err) {
-        alert("Erro ao excluir turma.");
+        toast.error("Erro ao excluir turma."); // Substituído por toast
       }
     }
   }
@@ -123,10 +129,11 @@ export default function Turmas() {
     if (window.confirm("Deseja realmente remover este aluno da turma?")) {
       try {
         await api.delete(`/turmas/${turmaSelecionada.id}/alunos/${alunoId}`);
+        toast.success("Aluno removido com sucesso!"); // Adicionado sucesso
         setAlunosDaTurma(alunosDaTurma.filter(a => a.id !== alunoId));
         carregarTurmas(); 
       } catch (err) {
-        alert("Erro ao remover aluno: " + err.message);
+        toast.error("Erro ao remover aluno: " + (err.response?.data?.message || err.message)); // Substituído por toast
       }
     }
   }
