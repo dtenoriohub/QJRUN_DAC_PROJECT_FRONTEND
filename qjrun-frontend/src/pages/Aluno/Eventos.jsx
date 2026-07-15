@@ -2,11 +2,12 @@ import { useState, useEffect } from "react";
 import MainLayout from "../../Layouts/MainLayout";
 import api from "../../Api/api";
 import { useAuth } from "../../Contexts/AuthContext";
+import { toast } from "react-toastify"; // Importação do Toast
 
 export default function Eventos() {
   const [eventos, setEventos] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { user } = useAuth(); // Pegamos o ID do aluno logado
+  const { user } = useAuth(); // Pega o ID do aluno logado
 
   useEffect(() => {
     carregarDados();
@@ -30,7 +31,6 @@ export default function Eventos() {
       // Cruza os dados para saber o status do aluno em cada evento
       const eventosEnriquecidos = todosEventos.map((evento) => {
         // Tenta achar uma inscrição deste aluno para este evento
-        // (Assumindo que sua API retorna a inscrição com o objeto evento aninhado: inscricao.evento.id)
         const inscricaoEncontrada = minhasInscricoes.find(
           (inscricao) => inscricao.evento?.id === evento.id
         );
@@ -45,7 +45,7 @@ export default function Eventos() {
       setEventos(eventosEnriquecidos);
     } catch (error) {
       console.error("Erro ao carregar dados:", error);
-      alert("Não foi possível carregar os eventos.");
+      toast.error("Não foi possível carregar os eventos."); // Substituído por toast
     } finally {
       setLoading(false);
     }
@@ -53,17 +53,17 @@ export default function Eventos() {
 
   async function handleInscrever(eventoId) {
     try {
-      // Como o api.js já manda os headers, a requisição fica super limpa!
+      // Como o api.js já manda os headers, a requisição fica limpa
       await api.post(`/inscricoes/aluno/${user.id}/evento/${eventoId}`);
 
-      alert("Inscrição solicitada com sucesso! Verifique a aba de Pagamentos.");
+      toast.success("Inscrição solicitada com sucesso! Verifique a aba de Pagamentos."); // Substituído por toast
       
       // Recarrega a tela para o botão mudar de "Inscrever-se" para "Pendente"
       carregarDados(); 
       
     } catch (error) {
       const mensagemErro = error.response?.data?.message || error.response?.data || "Erro ao realizar inscrição.";
-      alert(`Ops: ${mensagemErro}`);
+      toast.error(`Ops: ${mensagemErro}`); // Substituído por toast
     }
   }
 
@@ -76,14 +76,14 @@ export default function Eventos() {
       // Chama a rota de DELETE do backend
       await api.delete(`/inscricoes/aluno/${user.id}/evento/${eventoId}`);
 
-      alert("Inscrição cancelada com sucesso!");
+      toast.success("Inscrição cancelada com sucesso!"); // Substituído por toast
       
       // Recarrega a tela para o botão voltar a ser "Inscrever-se"
       carregarDados();
       
     } catch (error) {
       console.error("Erro ao cancelar:", error);
-      alert("Não foi possível cancelar a inscrição no momento.");
+      toast.error("Não foi possível cancelar a inscrição no momento."); // Substituído por toast
     }
   }
 

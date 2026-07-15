@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 import MainLayout from "../../Layouts/MainLayout";
 import api from "../../Api/api";
+import { toast } from "react-toastify"; // Importação do Toast
 
 export default function MeusPagamentos() {
-  // 1. Estados para armazenar os dados do backend e controlar o "loading"
+  // Estados para armazenar os dados do backend e controlar o "loading"
   const [pagamentos, setPagamentos] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // 2. Função para buscar os pagamentos na API
+  // Função para buscar os pagamentos na API
   async function carregarPagamentos() {
     try {
       setLoading(true);
@@ -27,13 +28,13 @@ export default function MeusPagamentos() {
       setPagamentos(response.data);
     } catch (error) {
       console.error("Erro ao buscar pagamentos:", error);
-      alert("Não foi possível carregar os seus pagamentos.");
+      toast.error("Não foi possível carregar os seus pagamentos."); // Substituído
     } finally {
       setLoading(false);
     }
   }
 
-  // 3. Executa a função automaticamente quando a tela abre
+  // Executa a função automaticamente quando a tela abre
   useEffect(() => {
     carregarPagamentos();
   }, []);
