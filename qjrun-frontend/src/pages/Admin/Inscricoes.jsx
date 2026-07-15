@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import MainLayout from "../../Layouts/MainLayout";
 import api from "../../Api/api";
 import { useAuth } from "../../Contexts/AuthContext";
+import { toast } from "react-toastify"; // Importação do Toast
 
 export default function Inscricoes() {
   const [inscricoes, setInscricoes] = useState([]);
@@ -22,7 +23,7 @@ export default function Inscricoes() {
       setInscricoes(response.data);
     } catch (error) {
       console.error("Erro ao carregar:", error);
-      alert("Erro ao carregar inscrições.");
+      toast.error("Erro ao carregar inscrições."); // Substituído por toast.error
     } finally {
       setLoading(false);
     }
@@ -36,10 +37,10 @@ export default function Inscricoes() {
     try {
       // 🧹 Requisição limpa
       await api.patch(`/inscricoes/${id}/aprovar`);
-      alert("Inscrição aprovada com sucesso!");
+      toast.success("Inscrição aprovada com sucesso!"); // Substituído por toast.success
       carregarInscricoes(); // Atualiza a lista automaticamente
     } catch (error) {
-      alert("Erro ao aprovar: " + (error.response?.data?.message || "Tente novamente"));
+      toast.error("Erro ao aprovar: " + (error.response?.data?.message || "Tente novamente")); // Substituído por toast.error
     }
   }
 
