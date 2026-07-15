@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom"; 
-import api from "../../Api/api"; // 🔑 Importa diretamente a API para usar a rota de cadastro geral
+import api from "../../Api/api"; // Importa diretamente a API para usar a rota de cadastro geral
+import { toast } from "react-toastify"; // Importação do Toast
 
 import Button from "../../Components/Button";
 import Input from "../../Components/Input";
@@ -18,7 +19,6 @@ export default function Cadastro() {
     confirmarSenha: ""
   });
 
-  const [erro, setErro] = useState("");
   const [loading, setLoading] = useState(false);
 
   function handleChange(e) {
@@ -31,11 +31,10 @@ export default function Cadastro() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    setErro(""); 
 
     // 1. Validação local de senha
     if (form.senha !== form.confirmarSenha) {
-      setErro("As senhas não coincidem.");
+      toast.warning("As senhas não coincidem."); // 🔔 Substituído
       return;
     }
 
@@ -49,14 +48,14 @@ export default function Cadastro() {
       const response = await api.post("/auth/register", dadosParaEnvio);
 
       // Exibe a mensagem dinâmica retornada pelo Spring Boot ("Primeiro usuário..." ou "Cadastrado como Aluno")
-      alert(response.data.message || "Conta criada com sucesso!");
+      toast.success(response.data.message || "Conta criada com sucesso!"); // Substituído
       
       // 4. Redireciona para a tela de login
       navigate("/");
     } catch (err) {
       // 5. Trata o erro capturando a resposta real da exceção do Spring Boot
       const mensagemDoBackend = err.response?.data?.message || "Erro ao realizar cadastro. Tente novamente.";
-      setErro(mensagemDoBackend);
+      toast.error(mensagemDoBackend); // 🔔 Substituído
     } finally {
       setLoading(false);
     }
@@ -74,13 +73,6 @@ export default function Cadastro() {
             Crie sua conta no sistema
           </p>
         </div>
-
-        {/* 🚨 Mensagem de Erro Dinâmica */}
-        {erro && (
-          <div className="mb-4 p-3 bg-red-100 text-red-700 text-sm rounded-xl text-center font-medium">
-            {erro}
-          </div>
-        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
