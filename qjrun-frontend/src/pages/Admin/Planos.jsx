@@ -6,27 +6,27 @@ import Input from "../../Components/Input";
 import Button from "../../Components/Button";
 import Modal from "../../Components/Modal";
 import api from "../../Api/api";
+import { toast } from "react-toastify"; // Importação do Toast
 
 export default function Planos() {
   const [planos, setPlanos] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [erro, setErro] = useState("");
 
-  // 📝 Estados para o Modal (Cadastro e Edição)
+  // Estados para o Modal (Cadastro e Edição)
   const [modalAberto, setModalAberto] = useState(false);
-  const [planoIdEdicao, setPlanoIdEdicao] = useState(null); // 🔑 Guarda o ID se for edição
+  const [planoIdEdicao, setPlanoIdEdicao] = useState(null); // Guarda o ID se for edição
   const [tipo, setTipo] = useState("");
   const [preco, setPreco] = useState("");
   const [duracaoMeses, setDuracaoMeses] = useState("");
   const [descricao, setDescricao] = useState("");
   const [salvando, setSalvando] = useState(false);
 
-  // 👁️ Estados para Modal de Visualização de Alunos
+  // Estados para Modal de Visualização de Alunos
   const [isViewStudentsModalOpen, setIsViewStudentsModalOpen] = useState(false);
   const [alunosDoPlano, setAlunosDoPlano] = useState([]);
   const [planoSelecionado, setPlanoSelecionado] = useState(null);
 
-  // 🔄 Função para buscar os planos do backend
+  // Função para buscar os planos do backend
   async function carregarPlanos() {
     try {
       setLoading(true);
@@ -34,7 +34,7 @@ export default function Planos() {
       setPlanos(Array.isArray(response.data) ? response.data : []);
     } catch (err) {
       console.error("Erro ao buscar planos:", err);
-      setErro("Não foi possível carregar a lista de planos.");
+      toast.error("Não foi possível carregar a lista de planos."); // Toast de erro
     } finally {
       setLoading(false);
     }
@@ -44,7 +44,7 @@ export default function Planos() {
     carregarPlanos();
   }, []);
 
-  // 👁️ Função para carregar alunos de um plano específico
+  // Função para carregar alunos de um plano específico
   async function handleViewStudents(plano) {
     setPlanoSelecionado(plano);
     try {
@@ -52,11 +52,11 @@ export default function Planos() {
       setAlunosDoPlano(response.data);
       setIsViewStudentsModalOpen(true);
     } catch (err) {
-      alert("Erro ao carregar alunos do plano.");
+      toast.error("Erro ao carregar alunos do plano."); // Substituído por toast
     }
   }
 
-  // ✍️ Prepara o Modal com os dados do plano para Edição
+  // Prepara o Modal com os dados do plano para Edição
   const iniciarEdicao = (plano) => {
     setPlanoIdEdicao(plano.id);
     setTipo(plano.tipo || "");
@@ -66,7 +66,7 @@ export default function Planos() {
     setModalAberto(true);
   };
 
-  // 🧹 Reseta o formulário e fecha o modal
+  // Reseta o formulário e fecha o modal
   const fecharModal = () => {
     setPlanoIdEdicao(null);
     setTipo("");
@@ -76,11 +76,10 @@ export default function Planos() {
     setModalAberto(false);
   };
 
-  // 💾 Envia o plano para o Backend (Suporta POST e PUT)
+  // Envia o plano para o Backend (Suporta POST e PUT)
   const salvarPlano = async (e) => {
     e.preventDefault();
     setSalvando(true);
-    setErro("");
 
     try {
       const userJson = localStorage.getItem("@qjrun:user");
@@ -97,33 +96,36 @@ export default function Planos() {
       };
 
       if (planoIdEdicao) {
-        // 🔄 Se tem ID de edição, atualiza com PUT
+        // Se tem ID de edição, atualiza com PUT
         await api.put(`/planos/${planoIdEdicao}`, dadosPlano);
+        toast.success("Plano atualizado com sucesso!"); // Toast de sucesso
       } else {
-        // 📥 Se não tem, cria um novo com POST
+        // Se não tem, cria um novo com POST
         await api.post("/planos", dadosPlano);
+        toast.success("Plano cadastrado com sucesso!"); // Toast de sucesso
       }
 
       fecharModal();
       carregarPlanos(); // Recarrega a tabela instantaneamente
     } catch (err) {
       console.error("Erro ao salvar o plano:", err);
-      setErro("Falha ao salvar o plano. Verifique os dados inseridos.");
+      toast.error("Falha ao salvar o plano. Verifique os dados inseridos."); // Toast de erro
     } finally {
       setSalvando(false);
     }
   };
 
-  // ❌ Deleta/Desativa o plano do banco
+  // Deleta/Desativa o plano do banco
   const excluirPlano = async (id) => {
+    // Mantem o window.confirm porque é uma pergunta de sim/não
     if (window.confirm("Tem certeza que deseja remover este plano?")) {
       try {
-        setErro("");
         await api.delete(`/planos/${id}`);
+        toast.success("Plano excluído com sucesso!"); // Toast de sucesso
         carregarPlanos(); // Atualiza a lista após deletar
       } catch (err) {
         console.error("Erro ao deletar plano:", err);
-        setErro("Não foi possível excluir o plano selecionado.");
+        toast.error("Não foi possível excluir o plano selecionado."); // Toast de erro
       }
     }
   };
@@ -136,16 +138,10 @@ export default function Planos() {
         onButtonClick={() => setModalAberto(true)} 
       />
 
-      {erro && (
-        <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-xl text-sm font-medium border border-red-100">
-          {erro}
-        </div>
-      )}
-
       {loading ? (
         <div className="p-6 text-gray-500 font-medium text-center">Carregando planos...</div>
       ) : (
-        // 🛠️ Adicionado "Alunos" nas colunas da tabela
+        // Adicionado "Alunos" nas colunas da tabela
         <Table columns={["Plano", "Preço", "Duração", "Criado Por", "Alunos", "Ações"]}>
           {planos.map((plano) => (
             <tr key={plano.id} className="border-t hover:bg-gray-50/50 transition">
@@ -158,7 +154,7 @@ export default function Planos() {
               </td>
               <td className="p-4 text-gray-500 text-sm">{plano.administrador?.nome || "Sistema"}</td>
 
-              {/* 👥 Nova coluna de Alunos */}
+              {/* Nova coluna de Alunos */}
               <td className="p-4">
                 <button
                   onClick={() => handleViewStudents(plano)}
@@ -170,14 +166,14 @@ export default function Planos() {
 
               <td className="p-4">
                 <div className="flex gap-2">
-                  {/* 🔑 Botão Editar - Passa o objeto do plano atual */}
+                  {/* Botão Editar - Passa o objeto do plano atual */}
                   <button 
                     onClick={() => iniciarEdicao(plano)}
                     className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm transition"
                   >
                     Editar
                   </button>
-                  {/* 🔑 Botão Remover - Passa o ID do plano atual */}
+                  {/* Botão Remover - Passa o ID do plano atual */}
                   <button 
                     onClick={() => excluirPlano(plano.id)}
                     className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm transition"
@@ -191,7 +187,7 @@ export default function Planos() {
         </Table>
       )}
 
-      {/* 🖼️ MODAL DE FORMULÁRIO (CADASTRO / EDIÇÃO) */}
+      {/* MODAL DE FORMULÁRIO (CADASTRO / EDIÇÃO) */}
       {modalAberto && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 animate-fadeIn">
           <div className="bg-white w-full max-w-lg p-8 rounded-2xl shadow-2xl relative">
@@ -268,7 +264,7 @@ export default function Planos() {
         </div>
       )}
 
-      {/* 👁️ MODAL DE VISUALIZAÇÃO DE ALUNOS */}
+      {/* MODAL DE VISUALIZAÇÃO DE ALUNOS */}
       <Modal
         isOpen={isViewStudentsModalOpen}
         onClose={() => setIsViewStudentsModalOpen(false)}
